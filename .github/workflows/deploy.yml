@@ -16,9 +16,9 @@ jobs:
       - name: Upload to Hetzner via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5   # check the repo for a newer tag
         with:
-          server:   ${{ secrets.FTP_SERVER }}        # e.g. www730.your-server.de
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server:   ${{ secrets.WEB_FTP_SERVER }}        # e.g. www730.your-server.de
+          username: ${{ secrets.WEB_FTP_USERNAME }}
+          password: ${{ secrets.WEB_FTP_PASSWORD }}
           protocol: ftps                              # encrypted FTP (explicit / FTPES), port 21
           local-dir: ./public/                        # your site files (note the trailing slash)
           server-dir: ./                              # web root for a DEDICATED ftp user (its root IS public_html)
