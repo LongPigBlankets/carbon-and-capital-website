@@ -11,12 +11,13 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Install paramiko
-        run: pip install paramiko
-
-      - name: Upload over SFTP
-        env:
-          SFTP_HOST: ${{ secrets.WEB_FTP_SERVER }}
-          SFTP_USER: ${{ secrets.WEB_FTP_USERNAME }}
-          SFTP_KEY: ${{ secrets.WEB_FTP_SSH_KEY }}
-        run: python deploy.py
+      - name: Deploy over FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.WEB_FTP_SERVER }}
+          username: ${{ secrets.WEB_FTP_USERNAME }}
+          password: ${{ secrets.WEB_FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./public/
+          server-dir: ./public_html/
