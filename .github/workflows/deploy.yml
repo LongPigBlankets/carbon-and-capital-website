@@ -11,12 +11,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Install paramiko
+        run: pip install paramiko
+
       - name: Upload over SFTP
-        uses: wangyucode/sftp-upload-action@v2.0.4
-        with:
-          host: ${{ secrets.WEB_FTP_SERVER }}
-          username: ${{ secrets.WEB_FTP_USERNAME }}
-          privateKey: ${{ secrets.WEB_FTP_SSH_KEY }}
-          localDir: 'public'
-          remoteDir: '/usr/home/cig7qy/public_html'
-          forceUpload: true
+        env:
+          SFTP_HOST: ${{ secrets.WEB_FTP_SERVER }}
+          SFTP_USER: ${{ secrets.WEB_FTP_USERNAME }}
+          SFTP_KEY: ${{ secrets.WEB_FTP_SSH_KEY }}
+        run: python deploy.py
