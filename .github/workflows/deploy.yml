@@ -20,7 +20,7 @@ jobs:
           echo "${{ secrets.WEB_FTP_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-      - name: Deploy over SFTP (lftp)
+      - name: Deploy over SFTP (lftp, mput)
         run: |
           lftp -c "
           set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new';
@@ -29,6 +29,8 @@ jobs:
           set xfer:clobber on;
           set xfer:use-temp-file no;
           open -u ${{ secrets.WEB_FTP_USERNAME }}, sftp://${{ secrets.WEB_FTP_SERVER }}:22;
-          mirror --reverse --verbose --no-perms ./public/ /usr/home/cig7qy/public_html/;
+          lcd ./public/;
+          cd /usr/home/cig7qy/public_html/;
+          mput *;
           bye
           "
