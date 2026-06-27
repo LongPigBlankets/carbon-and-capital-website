@@ -12,14 +12,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Load the SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.WEB_FTP_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p 22 "${{ secrets.WEB_FTP_SERVER }}" >> ~/.ssh/known_hosts
-
-          - name: Deploy over SFTP
+      - name: Deploy over SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.6
         with:
           server: ${{ secrets.WEB_FTP_SERVER }}
