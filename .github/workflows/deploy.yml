@@ -11,7 +11,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-     - name: Upload over SFTP
+      - name: Upload over SFTP
         uses: wangyucode/sftp-upload-action@v2.0.4
         with:
           host: ${{ secrets.WEB_FTP_SERVER }}
