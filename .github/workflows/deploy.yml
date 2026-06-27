@@ -1,0 +1,27 @@
+name: Deploy to Hetzner
+
+# Runs on every push to main. Merging a PR into main IS a push to main,
+# so approved pull requests deploy themselves.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Upload to Hetzner via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5   # check the repo for a newer tag
+        with:
+          server:   ${{ secrets.FTP_SERVER }}        # e.g. www730.your-server.de
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps                              # encrypted FTP (explicit / FTPES), port 21
+          local-dir: ./public/                        # your site files (note the trailing slash)
+          server-dir: ./                              # web root for a DEDICATED ftp user (its root IS public_html)
+          # If you use your MAIN account FTP user instead, change the line above to:
+          #   server-dir: /public_html/
+          # If the first run logs a "path not found" error, flip between those two — the log makes it obvious.
