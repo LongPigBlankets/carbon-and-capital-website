@@ -20,4 +20,5 @@ jobs:
           protocol: ftps
           port: 21
           local-dir: ./public/
-          server-dir: /usr/home/cig7qy/public_html/
+          server-dir: ./public_html/
+          log-level: verbose
