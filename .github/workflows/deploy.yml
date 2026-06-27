@@ -24,6 +24,10 @@ jobs:
         run: |
           lftp -c "
           set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new';
+          set sftp:auto-confirm yes;
+          set net:connection-limit 1;
+          set xfer:clobber on;
+          set xfer:use-temp-file no;
           open -u ${{ secrets.WEB_FTP_USERNAME }}, sftp://${{ secrets.WEB_FTP_SERVER }}:22;
           mirror --reverse --verbose --no-perms ./public/ /usr/home/cig7qy/public_html/;
           bye
