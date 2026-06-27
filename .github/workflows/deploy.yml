@@ -11,26 +11,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Install lftp
-        run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: Write the SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.WEB_FTP_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-      - name: Deploy over SFTP (lftp, mput)
-        run: |
-          lftp -c "
-          set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new';
-          set sftp:auto-confirm yes;
-          set net:connection-limit 1;
-          set xfer:clobber on;
-          set xfer:use-temp-file no;
-          open -u ${{ secrets.WEB_FTP_USERNAME }}, sftp://${{ secrets.WEB_FTP_SERVER }}:22;
-          lcd ./public/;
-          cd /usr/home/cig7qy/public_html/;
-          mput *;
-          bye
-          "
+      - name: Upload over SFTP
+        uses: wangyucode/sftp-upload-action@v3
+        with:
+          host: ${{ secrets.WEB_FTP_SERVER }}
+          username: ${{ secrets.WEB_FTP_USERNAME }}
+          privateKey: ${{ secrets.WEB_FTP_SSH_KEY }}
+          localDir: 'public'
+          remoteDir: '/usr/home/cig7qy/public_html'
+          forceUpload: true
