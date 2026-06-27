@@ -1,6 +1,5 @@
 name: Deploy to Hetzner
 
-# Runs on every push to main; merging a PR into main is a push to main.
 on:
   push:
     branches: [main]
@@ -12,12 +11,20 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Deploy over SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-        with:
-          server: ${{ secrets.WEB_FTP_SERVER }}
-          username: ${{ secrets.WEB_FTP_USERNAME }}
-          ssh_private_key: ${{ secrets.WEB_FTP_SSH_KEY }}
-          port: 22
-          local_path: './public/*'
-          remote_path: '/usr/home/cig7qy/public_html/'
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Write the SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.WEB_FTP_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Deploy over SFTP (lftp)
+        run: |
+          lftp -c "
+          set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new';
+          open -u ${{ secrets.WEB_FTP_USERNAME }}, sftp://${{ secrets.WEB_FTP_SERVER }}:22;
+          mirror --reverse --verbose --no-perms ./public/ /usr/home/cig7qy/public_html/;
+          bye
+          "
