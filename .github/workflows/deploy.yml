@@ -19,11 +19,12 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p 22 "${{ secrets.WEB_FTP_SERVER }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy with rsync over SSH
-        run: |
-          rsync -avz -e "ssh -i ~/.ssh/deploy_key -p 22" \
-            ./public/ \
-            "${{ secrets.WEB_FTP_USERNAME }}@${{ secrets.WEB_FTP_SERVER }}:public_html/"
-          # Add --delete (right after -avz) if you want the server to mirror public/
-          # exactly, i.e. remove anything on the server that isn't in your repo.
-          # Left off here so a deploy can only add/update, never delete.
+          - name: Deploy over SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
+        with:
+          server: ${{ secrets.WEB_FTP_SERVER }}
+          username: ${{ secrets.WEB_FTP_USERNAME }}
+          ssh_private_key: ${{ secrets.WEB_FTP_SSH_KEY }}
+          port: 22
+          local_path: './public/*'
+          remote_path: '/usr/home/cig7qy/public_html/'
