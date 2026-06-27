@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.WEB_FTP_PASSWORD }}
           protocol: ftps                              # encrypted FTP (explicit / FTPES), port 21
           local-dir: ./public/                        # your site files (note the trailing slash)
-          server-dir: ./                              # web root for a DEDICATED ftp user (its root IS public_html)
+          server-dir: ./public_html/                             # web root for a DEDICATED ftp user (its root IS public_html)
           # If you use your MAIN account FTP user instead, change the line above to:
           #   server-dir: /public_html/
           # If the first run logs a "path not found" error, flip between those two — the log makes it obvious.
