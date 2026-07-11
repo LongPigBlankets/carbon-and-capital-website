@@ -11,14 +11,19 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Deploy over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          server: ${{ secrets.WEB_FTP_SERVER }}
-          username: ${{ secrets.WEB_FTP_USERNAME }}
-          password: ${{ secrets.WEB_FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          local-dir: ./public/
-          server-dir: ./public_html/
-          log-level: verbose
+          python-version: '3.12'
+
+      - name: Install paramiko
+        run: pip install "paramiko>=3.4"
+
+      - name: Deploy over SFTP
+        env:
+          # Reuses the same known-good credentials the FTPS deploy used.
+          # mod_sftp on this host accepts password auth, so no SSH key is needed.
+          SFTP_HOST: ${{ secrets.WEB_FTP_SERVER }}
+          SFTP_USER: ${{ secrets.WEB_FTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.WEB_FTP_PASSWORD }}
+        run: python deploy.py
