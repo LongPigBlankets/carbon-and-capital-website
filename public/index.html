@@ -136,7 +136,8 @@
   // Every line rests light grey and lights to bright gold where the animation's wavefront is.
   // Brightness is sampled per point along each subdivided edge, so the gold is a moving band
   // with a gaussian falloff, not a whole-cell fill. Four modes (keys 1-4, or "a" to cycle):
-  //   1 origin pulses  — expanding gaussian rings out of scattered "building" origins
+  //   1 title ripples  — triangular wavefronts (flat top, acute left/right, rounded corners)
+  //                       radiating out of the title text; solid-gold crest with wide shoulders
   //   2 wave gradient  — gaussian crest bands roll diagonally across the field
   //   3 flowing glow   — an organic noise cloud of brightness drifts over the field
   //   4 hex explosions — 1 random hex erupts in an expanding ring; then 2 clash; repeat
@@ -159,11 +160,15 @@
     const BAND = 0.46 * HEX_HW;     // gaussian half-width of the lit band
     const SEG_LEN = 18.0;           // px between sampled points along each edge
 
-    // Animation 1 — origin pulses.
-    const A1_SPEED = 0.5;
-    const A1_WAVELEN = 230.0;
-    const A1_RANGE = 950.0;
-    const A1_ORIGINS = 8;           // scattered stand-ins for the empire's buildings
+    // Animation 1 — triangular ripples radiating from the title text.
+    const R_WAVELEN = 300.0;        // px between successive triangle rings
+    const R_SPEED = 0.42;           // rings per second, expanding outward
+    const R_CORE_HALF = 15.0;       // half of the 30px solid-gold crest
+    const R_BAND = 64.0;            // px gaussian shoulder each side of the core (~2x the old width)
+    const R_ROUND = 26.0;           // corner-rounding radius in px (softens the triangle's max)
+    // Downward triangle (flat top, acute left/right corners) — shape only; growth is homothetic
+    // about its incentre, which we pin to the text centre. Corners: top-left, top-right, apex.
+    const R_TRI = [[-1.0, -0.5], [1.0, -0.5], [0.0, 0.78]];
     // Animation 2 — wave gradient.
     const A2_DIR = { x: 0.80, y: 0.60 };
     const A2_WAVELEN = 300.0;
@@ -189,7 +194,8 @@
     let lastTs = null;
     let W = 0, H = 0;
     let loops = [];                 // Array<Float32Array> — flattened x,y point pairs
-    let origins = [];               // anim 1 ripple centres
+    let C = { x: 0, y: 0 };         // ripple origin = centre of the title text
+    let triN = [];                  // unit outward normals of the ripple triangle's 3 edges
     let explosions = [];            // anim 4: {ox, oy, t0}
     let nextCount = 1;
 
@@ -370,15 +376,32 @@
       }
     }
 
-    function scatterOrigins() {
-      const orng = mulberry32(4211);
-      origins = [];
-      for (let i = 0; i < A1_ORIGINS; i++) {
-        origins.push([
-          (0.08 + 0.84 * orng()) * W,
-          (0.08 + 0.84 * orng()) * H,
-        ]);
+    // Unit outward normals of the ripple triangle's three edges (shape is constant).
+    function buildTriNormals() {
+      const p = R_TRI;
+      const cx = (p[0][0] + p[1][0] + p[2][0]) / 3;
+      const cy = (p[0][1] + p[1][1] + p[2][1]) / 3;
+      triN = [];
+      for (let i = 0; i < 3; i++) {
+        const a = p[i], b = p[(i + 1) % 3];
+        let nx = -(b[1] - a[1]), ny = (b[0] - a[0]);     // perpendicular to the edge
+        const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+        if (nx * (mx - cx) + ny * (my - cy) < 0) { nx = -nx; ny = -ny; }   // point outward
+        const L = Math.hypot(nx, ny);
+        triN.push([nx / L, ny / L]);
       }
+    }
+
+    // Ripple origin = centre of the title + tagline block, measured from the DOM.
+    function measureTextCenter() {
+      const title = document.querySelector(".title");
+      const lede = document.querySelector(".lede");
+      if (!title) { C = { x: W / 2, y: H * 0.42 }; return; }
+      const r1 = title.getBoundingClientRect();
+      const r2 = lede ? lede.getBoundingClientRect() : r1;
+      const left = Math.min(r1.left, r2.left), right = Math.max(r1.right, r2.right);
+      const top = Math.min(r1.top, r2.top), bottom = Math.max(r1.bottom, r2.bottom);
+      C = { x: (left + right) / 2, y: (top + bottom) / 2 };
     }
 
     function randomCellCenter() {
@@ -392,20 +415,32 @@
     // Brightness field — sampled per point, in [0,1]. The grey->gold lerp uses this.
     // -----------------------------------------------------------------------------
 
-    function bBuilding(px, py) {
-      let b = 0;
-      const rng2 = A1_RANGE * A1_RANGE;
-      for (let i = 0; i < origins.length; i++) {
-        const dx = px - origins[i][0], dy = py - origins[i][1];
-        const d2 = dx * dx + dy * dy;
-        if (d2 > rng2) continue;
-        const d = Math.sqrt(d2);
-        const u = d / A1_WAVELEN - t * A1_SPEED;
-        const x = (Math.abs(u - Math.round(u)) * A1_WAVELEN) / BAND;
-        const v = Math.exp(-x * x) * (1 - d / A1_RANGE);
-        if (v > b) b = v;
+    // Triangular "distance" from the text: a soft-max of the three edge half-planes. With unit
+    // normals this has |gradient| ~= 1, so it reads in pixels; its level sets are similar
+    // triangles growing from the incentre (pinned to C). The soft-max rounds the corners.
+    function triDist(vx, vy) {
+      const t0 = triN[0][0] * vx + triN[0][1] * vy;
+      const t1 = triN[1][0] * vx + triN[1][1] * vy;
+      const t2 = triN[2][0] * vx + triN[2][1] * vy;
+      const m = Math.max(t0, t1, t2);
+      const k = 1.0 / R_ROUND;
+      return m + Math.log(Math.exp((t0 - m) * k) + Math.exp((t1 - m) * k) + Math.exp((t2 - m) * k)) / k;
+    }
+
+    function bTextRipple(px, py) {
+      const D = triDist(px - C.x, py - C.y);
+      const u = D / R_WAVELEN - t * R_SPEED;
+      const off = Math.abs((u - Math.round(u)) * R_WAVELEN);   // px to the nearest crest
+      let b;
+      if (off <= R_CORE_HALF) {
+        b = 1.0;                                               // 30px solid-gold crest
+      } else {
+        const x = (off - R_CORE_HALF) / R_BAND;                // wide gaussian shoulders
+        b = Math.exp(-x * x);
       }
-      return b;
+      // Soften rings toward the far edges so the field doesn't read as a flat plaid.
+      const fade = 1.0 - 0.5 * Math.min(1.0, D / Math.hypot(W, H));
+      return b * fade;
     }
 
     function bWave(px, py) {
@@ -434,7 +469,7 @@
 
     function brightness(px, py) {
       switch (mode) {
-        case 1: return bBuilding(px, py);
+        case 1: return bTextRipple(px, py);
         case 2: return bWave(px, py);
         case 3: return bGlow(px, py);
         case 4: return bExplode(px, py);
@@ -516,12 +551,13 @@
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       rebuildGeometry();
-      scatterOrigins();
+      buildTriNormals();
+      measureTextCenter();
       if (reducedMotion) draw();
     }
 
     const ANIM_NAMES = {
-      1: "1 · building-origin pulses",
+      1: "1 · title ripples",
       2: "2 · wave gradient",
       3: "3 · flowing glow",
       4: "4 · hex explosions",
