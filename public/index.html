@@ -40,57 +40,77 @@
       z-index:0;
       pointer-events:none;
     }
+    /* The metallic 7-hex plate (union of 4 top + 3 bottom hexes, gaps bridged) that the
+       text sits on. Positioned to the viewport centre, matching the flex-centred <main>. */
+    #plate{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      z-index:1;
+      /* 736 = the viewBox width, so on desktop the plate renders at scale 1 and its hexes are
+         exactly the background hex size (92px half-width) — the grid is then snapped to it. */
+      width:min(736px,94vw);
+      height:auto;
+      pointer-events:none;
+      /* Raised off the background: soft cast shadow down-and-right. */
+      filter:drop-shadow(6px 9px 11px rgba(0,0,0,0.5));
+    }
     main{
       position:relative;
       z-index:2;
-      max-width:40rem;
+      max-width:34rem;
       animation:rise .8s cubic-bezier(.2,.7,.2,1) both;
-      /* Navy halo hugging the glyph shapes (~50px) so the hex lattice never intrudes into the text. */
-      filter:
-        drop-shadow(0 0 4px var(--bg))
-        drop-shadow(0 0 8px var(--bg))
-        drop-shadow(0 0 14px var(--bg))
-        drop-shadow(0 0 22px var(--bg))
-        drop-shadow(0 0 32px var(--bg))
-        drop-shadow(0 0 44px var(--bg))
-        drop-shadow(0 0 50px var(--bg));
+    }
+    /* Embossed text on the navy plate: top-left highlight, bottom-right seat shadow, soft cast shade. */
+    .emboss-white{
+      color:#FBFAF4;
+      text-shadow:
+        -1px -1px 0.5px rgba(255,255,255,0.5),
+         1px  1.5px 1px rgba(0,0,0,0.75),
+         2px  4px  6px rgba(0,0,0,0.55);
+    }
+    .emboss-gold{
+      color:#E9C877;
+      text-shadow:
+        -1px -1px 0.5px rgba(255,247,216,0.62),
+         1px  1.5px 1px rgba(0,0,0,0.75),
+         2px  4px  6px rgba(0,0,0,0.55);
     }
     .title{
       font-family:var(--font-display);
       font-weight:600;
       letter-spacing:-0.012em;
       line-height:1.04;
-      font-size:clamp(2.5rem,8vw,4.75rem);
-      margin-bottom:1.05rem;
+      font-size:clamp(1.8rem,6.5vw,4.15rem);
+      margin-bottom:1rem;
     }
-    .title .carbon{color:#ffffff;}
-    .title .capital{color:var(--capital);}
     .title .amp{
-      color:var(--muted);
       font-style:italic;
       font-weight:400;
       font-size:.72em;
       padding:0 .08em;
     }
     .lede{
-      font-size:clamp(1.05rem,2.4vw,1.3rem);
+      font-size:clamp(.96rem,2.15vw,1.15rem);
       font-weight:400;
       letter-spacing:.01em;
     }
+    /* Engraved divider groove on the metal. */
     .rule{
       width:3.25rem;
-      height:1px;
-      background:var(--rule);
-      margin:1.9rem auto;
+      height:2px;
+      background:linear-gradient(90deg,transparent,rgba(54,38,12,0.75),transparent);
+      box-shadow:0 1px 0 rgba(255,246,214,0.28);
+      border:0;
+      margin:1.5rem auto;
     }
     .note{
-      font-size:clamp(.95rem,2vw,1.05rem);
-      color:var(--muted);
+      font-size:clamp(.86rem,1.8vw,.95rem);
       line-height:1.65;
       letter-spacing:.015em;
     }
     .note strong{
-      color:var(--ink);
       font-weight:500;
     }
     #animlabel{
@@ -108,6 +128,13 @@
       from{opacity:0;transform:translateY(14px);}
       to{opacity:1;transform:none;}
     }
+    /* Tighten the text block on small screens so it fits the (shorter) plate. */
+    @media (max-width:480px){
+      .title{margin-bottom:.55rem;}
+      .lede{font-size:1rem;}
+      .rule{margin:.85rem auto;}
+      .note{line-height:1.5;font-size:.9rem;}
+    }
     @media (prefers-reduced-motion:reduce){
       main{animation:none;}
     }
@@ -115,13 +142,66 @@
 </head>
 <body>
   <canvas id="hexbg" aria-hidden="true"></canvas>
+
+  <!-- Hex plate: the union outline of 7 hexes (4 top + 3 bottom), the inter-row gaps bridged
+       by the two short vertical segments on the left (x=92) and right (x=644) so it reads as
+       one continuous object. Navy interior (matches the background, clears the pattern); only
+       the raised edge is gold, lit from top-left and darkening to the bottom-right. It is sized
+       and grid-snapped by JS so its hexes line up exactly with the background lattice. -->
+  <svg id="plate" viewBox="0 0 736 414.32" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="plateEdge" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0"    stop-color="#FFF6D8"/>
+        <stop offset="0.45" stop-color="#D6A94E"/>
+        <stop offset="0.75" stop-color="#8A6A2C"/>
+        <stop offset="1"    stop-color="#3E2E0F"/>
+      </linearGradient>
+      <linearGradient id="plateBead" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0"    stop-color="#FFFDF0"/>
+        <stop offset="0.5"  stop-color="#F0D488"/>
+        <stop offset="1"    stop-color="#9C7A32"/>
+      </linearGradient>
+      <!-- metallic sheen over the navy interior: cool highlight top-left, deepening bottom-right -->
+      <radialGradient id="navySheen" cx="0.32" cy="0.24" r="0.95">
+        <stop offset="0"    stop-color="#3A5570" stop-opacity="0.55"/>
+        <stop offset="0.4"  stop-color="#17293C" stop-opacity="0.28"/>
+        <stop offset="0.75" stop-color="#040F1B" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#01060C" stop-opacity="0.55"/>
+      </radialGradient>
+      <radialGradient id="screwBody" cx="0.35" cy="0.3" r="0.85">
+        <stop offset="0"    stop-color="#FBE9B0"/>
+        <stop offset="0.55" stop-color="#C9A24A"/>
+        <stop offset="1"    stop-color="#6E5320"/>
+      </radialGradient>
+      <g id="screw">
+        <circle r="8" fill="url(#screwBody)" stroke="#241B06" stroke-width="1.3"/>
+        <circle r="8" cx="-0.5" cy="-0.5" fill="none" stroke="#FFF3CE" stroke-width="0.7" opacity="0.45"/>
+        <line x1="-4.6" y1="-2.6" x2="4.6" y2="2.6" stroke="#241B06" stroke-width="1.8" stroke-linecap="round"/>
+      </g>
+    </defs>
+    <!-- navy interior + metal sheen (d set by JS with rounded corners) -->
+    <path id="plateFill" fill="#040F1B" stroke="none"/>
+    <path id="plateSheenP" fill="url(#navySheen)" stroke="none"/>
+    <!-- 10px raised gold rim, lit top-left -> dark bottom-right, with a polished highlight bead -->
+    <path id="plateRim" fill="none" stroke="url(#plateEdge)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+    <path id="plateBeadP" fill="none" stroke="url(#plateBead)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- one screw per hex, ~20px inside the outer pointy vertex (top row -> top, bottom row -> bottom) -->
+    <use href="#screw" transform="translate(92,20) rotate(18)"/>
+    <use href="#screw" transform="translate(276,20) rotate(-13)"/>
+    <use href="#screw" transform="translate(460,20) rotate(26)"/>
+    <use href="#screw" transform="translate(644,20) rotate(-21)"/>
+    <use href="#screw" transform="translate(184,394.32) rotate(9)"/>
+    <use href="#screw" transform="translate(368,394.32) rotate(-17)"/>
+    <use href="#screw" transform="translate(552,394.32) rotate(22)"/>
+  </svg>
+
   <main>
     <h1 class="title">
-      <span class="carbon">Carbon</span> <span class="amp">and</span> <span class="capital">Capital</span>
+      <span class="emboss-white">Carbon</span> <span class="amp emboss-gold">and</span> <span class="emboss-white">Capital</span>
     </h1>
-    <p class="lede">is a strategy game.</p>
+    <p class="lede emboss-white">is a strategy game.</p>
     <div class="rule" role="presentation"></div>
-    <p class="note"><strong>A demo will come out soon.</strong><br>Come back for updates.</p>
+    <p class="note"><strong class="emboss-white">A demo will come out soon.</strong><br><span class="emboss-gold">Come back for updates.</span></p>
   </main>
   <div id="animlabel"></div>
 
@@ -196,6 +276,7 @@
     let loops = [];                 // Array<Float32Array> — flattened x,y point pairs
     let C = { x: 0, y: 0 };         // ripple origin = centre of the title text
     let triN = [];                  // unit outward normals of the ripple triangle's 3 edges
+    let gridOX = 0, gridOY = 0;     // phase shift so a 7-hex cluster lands under the centred plate
     let explosions = [];            // anim 4: {ox, oy, t0}
     let nextCount = 1;
 
@@ -362,15 +443,35 @@
       };
     }
 
+    // Phase-shift the whole lattice by (gridOX, gridOY) so one 7-hex cluster (4 top + 3 bottom)
+    // lands exactly under the centred plate. The plate's A cell (its top-left hex) should sit at
+    // plateCentre + (viewBoxA - viewBoxCentre) * scale; we snap the nearest grid cell there.
+    function computeGridOffset() {
+      const g = cellSpacing();
+      const plate = document.getElementById("plate");
+      if (!plate) { gridOX = 0; gridOY = 0; return; }
+      const r = plate.getBoundingClientRect();
+      const scale = r.width / 736;                 // viewBox width is 736
+      const pcx = r.left + r.width / 2, pcy = r.top + r.height / 2;
+      // A cell centre relative to the plate centre (viewBox A = 92,106.235; centre = 368,207.16)
+      const ax = pcx + (92 - 368) * scale;
+      const ay = pcy + (106.235 - 207.16) * scale;
+      const rr0 = Math.round(ay / g.rowSp);
+      gridOY = ay - rr0 * g.rowSp;
+      const off = posmod(rr0, 2) * g.hw;
+      const c0 = Math.round((ax - off) / g.colSp);
+      gridOX = ax - (c0 * g.colSp + off);
+    }
+
     function rebuildGeometry() {
       loops = [];
       const g = cellSpacing();
       const cols = Math.floor(W / g.colSp) + 4;
       const rows = Math.floor(H / g.rowSp) + 4;
-      for (let rr = -1; rr < rows; rr++) {
-        for (let c = -1; c < cols; c++) {
-          const cx = c * g.colSp + posmod(rr, 2) * g.hw;
-          const cy = rr * g.rowSp;
+      for (let rr = -2; rr < rows; rr++) {
+        for (let c = -2; c < cols; c++) {
+          const cx = c * g.colSp + posmod(rr, 2) * g.hw + gridOX;
+          const cy = rr * g.rowSp + gridOY;
           collectCell(cx, cy, g.hw, g.ht, g.sh, posmod(c, 3));
         }
       }
@@ -408,7 +509,7 @@
       const g = cellSpacing();
       const c = Math.floor(rng() * (Math.max(Math.floor(W / g.colSp), 1) + 1));
       const rr = Math.floor(rng() * (Math.max(Math.floor(H / g.rowSp), 1) + 1));
-      return [c * g.colSp + posmod(rr, 2) * g.hw, rr * g.rowSp];
+      return [c * g.colSp + posmod(rr, 2) * g.hw + gridOX, rr * g.rowSp + gridOY];
     }
 
     // -----------------------------------------------------------------------------
@@ -550,6 +651,7 @@
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      computeGridOffset();
       rebuildGeometry();
       buildTriNormals();
       measureTextCenter();
@@ -583,6 +685,38 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(resize, 150);
     });
+
+    // The plate outline (viewBox coords) — 4 top hexes + 3 bottom, inter-row gaps bridged.
+    // Rendered with slightly rounded corners so the sharp hex points don't read as cut-offs.
+    const PLATE_POINTS = [
+      [0, 53.12], [92, 0], [184, 53.12], [276, 0], [368, 53.12], [460, 0], [552, 53.12],
+      [644, 0], [736, 53.12], [736, 159.35], [644, 212.47], [644, 254.96], [644, 361.20],
+      [552, 414.32], [460, 361.20], [368, 414.32], [276, 361.20], [184, 414.32],
+      [92, 361.20], [92, 254.96], [92, 212.47], [0, 159.35],
+    ];
+    function roundedPathD(pts, r) {
+      const n = pts.length;
+      let d = "";
+      for (let i = 0; i < n; i++) {
+        const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n];
+        const v1x = p0[0] - p1[0], v1y = p0[1] - p1[1];
+        const v2x = p2[0] - p1[0], v2y = p2[1] - p1[1];
+        const l1 = Math.hypot(v1x, v1y), l2 = Math.hypot(v2x, v2y);
+        const r1 = Math.min(r, l1 * 0.5), r2 = Math.min(r, l2 * 0.5);
+        const bx = p1[0] + v1x / l1 * r1, by = p1[1] + v1y / l1 * r1;
+        const ax = p1[0] + v2x / l2 * r2, ay = p1[1] + v2y / l2 * r2;
+        d += (i === 0 ? "M " : " L ") + bx.toFixed(2) + " " + by.toFixed(2);
+        d += " Q " + p1[0] + " " + p1[1] + " " + ax.toFixed(2) + " " + ay.toFixed(2);
+      }
+      return d + " Z";
+    }
+    (function buildPlatePath() {
+      const d = roundedPathD(PLATE_POINTS, 11);
+      ["plateFill", "plateSheenP", "plateRim", "plateBeadP"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute("d", d);
+      });
+    })();
 
     resize();
     if (reducedMotion) draw();
