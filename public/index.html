@@ -48,26 +48,20 @@
       top:50%;
       transform:translate(-50%,-50%);
       z-index:1;
-      /* 828 = the viewBox width, so on desktop the plate renders at scale 1 and its hexes are
+      /* 736 = the viewBox width, so on desktop the plate renders at scale 1 and its hexes are
          exactly the background hex size (92px half-width) — the grid is then snapped to it. */
-      width:min(828px,96vw);
+      width:min(736px,94vw);
       height:auto;
       pointer-events:none;
       /* Raised off the background: soft cast shadow down-and-right. */
       filter:drop-shadow(6px 9px 11px rgba(0,0,0,0.5));
-      /* Opacity-only fade so it never overrides the centring transform. */
-      animation:platein .9s ease both;
     }
-    @keyframes platein{from{opacity:0;}to{opacity:1;}}
-    /* Title letters set into the hexes + the tagline/note, all embossed on the plate. */
-    #plate text{text-anchor:middle;dominant-baseline:central;}
-    #plate .big{font-family:var(--font-display);font-weight:600;font-size:104px;fill:#FBFAF4;letter-spacing:-0.01em;}
-    #plate .andw{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:44px;fill:#EAC777;}
-    #plate .tag{font-family:var(--font-body);font-weight:400;font-size:28px;fill:#FBFAF4;}
-    #plate .note1{font-family:var(--font-body);font-weight:500;font-size:23px;fill:#FBFAF4;}
-    #plate .note2{font-family:var(--font-body);font-weight:500;font-size:23px;fill:#EAC777;}
-    /* Visually hidden but available to screen readers. */
-    .sr-only{position:fixed;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;margin:-1px;}
+    main{
+      position:relative;
+      z-index:2;
+      max-width:34rem;
+      animation:rise .8s cubic-bezier(.2,.7,.2,1) both;
+    }
     /* Embossed text on the navy plate: top-left highlight, bottom-right seat shadow, soft cast shade. */
     .emboss-white{
       color:#FBFAF4;
@@ -142,7 +136,7 @@
       .note{line-height:1.5;font-size:.9rem;}
     }
     @media (prefers-reduced-motion:reduce){
-      #plate{animation:none;}
+      main{animation:none;}
     }
   </style>
 </head>
@@ -154,7 +148,7 @@
        one continuous object. Navy interior (matches the background, clears the pattern); only
        the raised edge is gold, lit from top-left and darkening to the bottom-right. It is sized
        and grid-snapped by JS so its hexes line up exactly with the background lattice. -->
-  <svg id="plate" viewBox="0 0 828 616.15" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+  <svg id="plate" viewBox="0 0 736 414.32" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
     <defs>
       <linearGradient id="plateEdge" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0"    stop-color="#FFF6D8"/>
@@ -184,21 +178,6 @@
         <circle r="8" cx="-0.5" cy="-0.5" fill="none" stroke="#FFF3CE" stroke-width="0.7" opacity="0.45"/>
         <line x1="-4.6" y1="-2.6" x2="4.6" y2="2.6" stroke="#241B06" stroke-width="1.8" stroke-linecap="round"/>
       </g>
-      <!-- Emboss: dark seat shadow bottom-right + light highlight top-left, so the letters read
-           as raised on the metal and cast a shade onto it. -->
-      <filter id="emb" x="-20%" y="-20%" width="140%" height="140%">
-        <feOffset in="SourceAlpha" dx="1.4" dy="1.9" result="do"/>
-        <feGaussianBlur in="do" stdDeviation="1.1" result="ds"/>
-        <feFlood flood-color="#04101c" flood-opacity="0.85" result="dc"/>
-        <feComposite in="dc" in2="ds" operator="in" result="dsh"/>
-        <feOffset in="SourceAlpha" dx="-1" dy="-1.2" result="lo"/>
-        <feGaussianBlur in="lo" stdDeviation="0.6" result="ls"/>
-        <feFlood flood-color="#fffaf0" flood-opacity="0.42" result="lc"/>
-        <feComposite in="lc" in2="ls" operator="in" result="lsh"/>
-        <feMerge>
-          <feMergeNode in="dsh"/><feMergeNode in="lsh"/><feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
     </defs>
     <!-- navy interior + metal sheen (d set by JS with rounded corners) -->
     <path id="plateFill" fill="#040F1B" stroke="none"/>
@@ -206,40 +185,23 @@
     <!-- 10px raised gold rim, lit top-left -> dark bottom-right, with a polished highlight bead -->
     <path id="plateRim" fill="none" stroke="url(#plateEdge)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
     <path id="plateBeadP" fill="none" stroke="url(#plateBead)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    <!-- one screw per hex, ~20px inside the outer pointy vertex (top/middle -> top, bottom -> bottom) -->
+    <!-- one screw per hex, ~20px inside the outer pointy vertex (top row -> top, bottom row -> bottom) -->
     <use href="#screw" transform="translate(92,20) rotate(18)"/>
     <use href="#screw" transform="translate(276,20) rotate(-13)"/>
     <use href="#screw" transform="translate(460,20) rotate(26)"/>
     <use href="#screw" transform="translate(644,20) rotate(-21)"/>
-    <use href="#screw" transform="translate(184,221.84) rotate(14)"/>
-    <use href="#screw" transform="translate(368,221.84) rotate(-9)"/>
-    <use href="#screw" transform="translate(552,221.84) rotate(20)"/>
-    <use href="#screw" transform="translate(736,221.84) rotate(-24)"/>
-    <use href="#screw" transform="translate(276,596.15) rotate(9)"/>
-    <use href="#screw" transform="translate(460,596.15) rotate(-17)"/>
-    <use href="#screw" transform="translate(644,596.15) rotate(22)"/>
-    <!-- Title set into the hexes: each of CARBON's/CAPITAL's hexes holds two letters (left+right
-         half); "and" fills the 4th top hex; the tagline & note sit in the extra bottom row. -->
-    <g id="plateText" filter="url(#emb)">
-      <g class="big">
-        <text x="46" y="106.2">C</text><text x="138" y="106.2">A</text><text x="230" y="106.2">R</text>
-        <text x="322" y="106.2">B</text><text x="414" y="106.2">O</text><text x="506" y="106.2">N</text>
-        <text x="138" y="308.1">C</text><text x="230" y="308.1">A</text><text x="322" y="308.1">P</text>
-        <text x="414" y="308.1">I</text><text x="506" y="308.1">T</text><text x="598" y="308.1">A</text>
-        <text x="690" y="308.1">L</text>
-      </g>
-      <text class="andw" x="644" y="106.2">and</text>
-      <text class="tag"   x="460" y="471.9">is a strategy game.</text>
-      <text class="note1" x="460" y="517.9">A demo will come out soon.</text>
-      <text class="note2" x="460" y="555.9">Come back for updates.</text>
-    </g>
+    <use href="#screw" transform="translate(184,394.32) rotate(9)"/>
+    <use href="#screw" transform="translate(368,394.32) rotate(-17)"/>
+    <use href="#screw" transform="translate(552,394.32) rotate(22)"/>
   </svg>
 
-  <!-- Accessible text equivalent (the visual title lives in the SVG plate above). -->
-  <main class="sr-only">
-    <h1>Carbon and Capital</h1>
-    <p>is a strategy game.</p>
-    <p>A demo will come out soon. Come back for updates.</p>
+  <main>
+    <h1 class="title">
+      <span class="emboss-white">Carbon</span> <span class="amp emboss-gold">and</span> <span class="emboss-white">Capital</span>
+    </h1>
+    <p class="lede emboss-white">is a strategy game.</p>
+    <div class="rule" role="presentation"></div>
+    <p class="note"><strong class="emboss-white">A demo will come out soon.</strong><br><span class="emboss-gold">Come back for updates.</span></p>
   </main>
   <div id="animlabel"></div>
 
@@ -489,11 +451,11 @@
       const plate = document.getElementById("plate");
       if (!plate) { gridOX = 0; gridOY = 0; return; }
       const r = plate.getBoundingClientRect();
-      const scale = r.width / 828;                 // viewBox width is 828
+      const scale = r.width / 736;                 // viewBox width is 736
       const pcx = r.left + r.width / 2, pcy = r.top + r.height / 2;
-      // A cell centre relative to the plate centre (viewBox A = 92,106.235; centre = 414,308.07)
-      const ax = pcx + (92 - 414) * scale;
-      const ay = pcy + (106.235 - 308.07) * scale;
+      // A cell centre relative to the plate centre (viewBox A = 92,106.235; centre = 368,207.16)
+      const ax = pcx + (92 - 368) * scale;
+      const ay = pcy + (106.235 - 207.16) * scale;
       const rr0 = Math.round(ay / g.rowSp);
       gridOY = ay - rr0 * g.rowSp;
       const off = posmod(rr0, 2) * g.hw;
@@ -531,12 +493,16 @@
       }
     }
 
-    // Ripple origin = centre of the plate (the title now lives inside the SVG plate).
+    // Ripple origin = centre of the title + tagline block, measured from the DOM.
     function measureTextCenter() {
-      const plate = document.getElementById("plate");
-      if (!plate) { C = { x: W / 2, y: H / 2 }; return; }
-      const r = plate.getBoundingClientRect();
-      C = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      const title = document.querySelector(".title");
+      const lede = document.querySelector(".lede");
+      if (!title) { C = { x: W / 2, y: H * 0.42 }; return; }
+      const r1 = title.getBoundingClientRect();
+      const r2 = lede ? lede.getBoundingClientRect() : r1;
+      const left = Math.min(r1.left, r2.left), right = Math.max(r1.right, r2.right);
+      const top = Math.min(r1.top, r2.top), bottom = Math.max(r1.bottom, r2.bottom);
+      C = { x: (left + right) / 2, y: (top + bottom) / 2 };
     }
 
     function randomCellCenter() {
@@ -720,15 +686,13 @@
       resizeTimer = setTimeout(resize, 150);
     });
 
-    // The plate outline (viewBox coords) — 3 rows: 4 top hexes + 4 middle + 3 bottom, the
-    // inter-row gaps bridged by short vertical segments so it reads as one continuous object.
+    // The plate outline (viewBox coords) — 4 top hexes + 3 bottom, inter-row gaps bridged.
     // Rendered with slightly rounded corners so the sharp hex points don't read as cut-offs.
     const PLATE_POINTS = [
       [0, 53.12], [92, 0], [184, 53.12], [276, 0], [368, 53.12], [460, 0], [552, 53.12],
-      [644, 0], [736, 53.12], [736, 159.35], [736, 201.84], [828, 254.96], [828, 361.19],
-      [736, 414.31], [736, 456.80], [736, 563.03], [644, 616.15], [552, 563.03], [460, 616.15],
-      [368, 563.03], [276, 616.15], [184, 563.03], [184, 456.80], [184, 414.31], [92, 361.19],
-      [92, 254.96], [92, 212.46], [0, 159.35],
+      [644, 0], [736, 53.12], [736, 159.35], [644, 212.47], [644, 254.96], [644, 361.20],
+      [552, 414.32], [460, 361.20], [368, 414.32], [276, 361.20], [184, 414.32],
+      [92, 361.20], [92, 254.96], [92, 212.47], [0, 159.35],
     ];
     function roundedPathD(pts, r) {
       const n = pts.length;
