@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download — Carbon and Capital</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%230F1A17'/%3E%3Cpath d='M16 2a14 14 0 000 28z' fill='%2374B89A'/%3E%3Cpath d='M16 2a14 14 0 010 28z' fill='%23CBA255'/%3E%3C/svg%3E">
+  <style>
+    :root{
+      --ink:#ECEAE1;
+      --gold:#E9C877;
+      --font-display:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+      --font-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{
+      font-family:var(--font-body);
+      color:var(--ink);
+      /* navy, lit from the top-left, deepening to the bottom-right */
+      background:linear-gradient(135deg,#0e2436 0%,#061421 46%,#02090f 100%);
+      min-height:100svh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+      -webkit-font-smoothing:antialiased;
+    }
+    main{width:100%;max-width:30rem;}
+    /* Accordion */
+    .acc{
+      border-top:1px solid rgba(233,200,119,0.18);
+      border-bottom:1px solid rgba(233,200,119,0.18);
+    }
+    .acc>summary{
+      list-style:none;
+      cursor:pointer;
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:1.7rem;
+      color:#FBFAF4;
+      padding:0.9rem 0;
+      user-select:none;
+    }
+    .acc>summary::-webkit-details-marker{display:none;}
+    .acc>summary::before{
+      content:"\25B8";              /* right-pointing triangle */
+      display:inline-block;
+      margin-right:.55rem;
+      color:var(--gold);
+      font-size:.8em;
+      transition:transform .2s ease;
+    }
+    .acc[open]>summary::before{transform:rotate(90deg);}
+    .acc-body{padding:0.2rem 0 1rem;}
+    /* Download links: each on its own row, indented 20px */
+    .dl-link{
+      display:block;
+      width:max-content;
+      margin-left:20px;
+      padding:0.5rem 0;
+      color:var(--gold);
+      text-decoration:none;
+      font-size:1.08rem;
+      letter-spacing:.01em;
+    }
+    .dl-link:hover,.dl-link:focus-visible{text-decoration:underline;}
+  </style>
+</head>
+<body>
+  <main>
+    <details class="acc" open>
+      <summary>Download</summary>
+      <div class="acc-body">
+        <!-- Placeholder payloads (test images). Swap these href/download targets for the real
+             ~600MB build zips once they're uploaded to this /download folder. -->
+        <a class="dl-link" href="graphite.png" download="carbon-and-capital-windows.png">Download for Windows</a>
+        <a class="dl-link" href="biomass.png"  download="carbon-and-capital-mac.png">Download for Mac</a>
+      </div>
+    </details>
+  </main>
+
+  <!-- Visitor analytics -->
+  <script data-goatcounter="https://carbonandcapital.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
