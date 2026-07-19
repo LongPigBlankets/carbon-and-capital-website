@@ -75,16 +75,16 @@
     .emboss-white{
       color:#FDFCF7;
       text-shadow:
-        -1.5px -1.5px 0.5px rgba(255,255,255,0.78),
-         1.5px  2px 1.5px rgba(0,0,0,0.9),
-         3px  5px  9px rgba(0,0,0,0.62);
+        -0.0115em -0.0115em 0.004em rgba(255,255,255,0.78),
+         0.0115em  0.015em 0.0115em rgba(0,0,0,0.9),
+         0.023em  0.038em 0.069em rgba(0,0,0,0.62);
     }
     .emboss-gold{
       color:#F1D084;
       text-shadow:
-        -1.5px -1.5px 0.5px rgba(255,249,224,0.88),
-         1.5px  2px 1.5px rgba(0,0,0,0.9),
-         3px  5px  9px rgba(0,0,0,0.62);
+        -0.0115em -0.0115em 0.004em rgba(255,249,224,0.88),
+         0.0115em  0.015em 0.0115em rgba(0,0,0,0.9),
+         0.023em  0.038em 0.069em rgba(0,0,0,0.62);
     }
     .title{
       margin:0;
@@ -93,8 +93,9 @@
       flex-direction:column;
       justify-content:space-between;
       align-items:center;
-      /* anchor Carbon/Capital ~40px from the plate's top/bottom (scales with the plate) */
-      padding:calc(min(736px,94vw) * 0.0543) 0;
+      /* offset from the INNER edge of the top/bottom hex rows (the valleys, not the tips),
+         so Carbon/Capital sit further toward the middle; scales with the plate */
+      padding:calc(min(736px,94vw) * 0.115) 0;
       font-family:var(--font-display);
       font-weight:600;
       letter-spacing:-0.012em;
