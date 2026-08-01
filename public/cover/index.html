@@ -39,6 +39,35 @@
       -webkit-font-smoothing:antialiased;
       text-rendering:optimizeLegibility;
     }
+    /* Gold wave: a second, GOLD copy of the hex tile (same size/phase as the grey body tile, via
+       the same --bg-x/--bg-y + background-size), revealed by a soft diagonal band that sweeps
+       bottom-left -> top-right — the ~10s transit, in a 12s loop with brief calm at each end so
+       it repeats seamlessly. The hexes wave into and out of gold; the band's soft edges + the
+       tile's baked bloom are the glow spilling over. Absolute + document-tall so it scrolls
+       locked to the grey tile; pure CSS (no canvas) so it can't stall the renderer. */
+    .hex-wave{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background-image:url("hex-tile-gold.png");
+      background-repeat:repeat;
+      background-size:calc(min(736px,94vw) * 0.75) auto;
+      background-position:var(--bg-x,0) var(--bg-y,0);
+      -webkit-mask-image:linear-gradient(45deg, transparent 40%, #000 50%, transparent 60%);
+              mask-image:linear-gradient(45deg, transparent 40%, #000 50%, transparent 60%);
+      -webkit-mask-size:220% 220%;  mask-size:220% 220%;
+      -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+      animation:goldwave 12s linear infinite;
+      will-change:-webkit-mask-position, mask-position;
+    }
+    /* sweep the reveal band from the bottom-left corner to the top-right corner (off-screen at
+       both ends so the 10s loop is seamless) */
+    @keyframes goldwave{
+      from{ -webkit-mask-position:100% 0%;   mask-position:100% 0%; }
+      to{   -webkit-mask-position:0% 100%;   mask-position:0% 100%; }
+    }
+    @media (prefers-reduced-motion:reduce){ .hex-wave{ animation:none; opacity:0; } }
     /* The metallic 7-hex plate (union of 4 top + 3 bottom hexes, gaps bridged) that the
        text sits on. Positioned to the viewport centre, matching the flex-centred <main>. */
     #plate{
@@ -173,6 +202,8 @@
   </style>
 </head>
 <body>
+  <div class="hex-wave" aria-hidden="true"></div>
+
   <header class="hero">
     <div class="emblem">
 
