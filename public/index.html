@@ -13,8 +13,29 @@
       --capital:#CBA255;
       --muted:#899A91;
       --rule:rgba(236,234,225,0.14);
+      --text:#FDFCF7;        /* site default text colour: off-white */
       --font-display:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
       --font-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      --font-header:"Bebas Neue","Oswald","Arial Narrow",sans-serif;
+      --font-ui:"IBM Plex Sans Condensed","IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    }
+    /* Bebas Neue (SIL Open Font License), self-hosted: no third-party font request. */
+    @font-face{
+      font-family:"Bebas Neue";
+      font-style:normal;
+      font-weight:400;
+      font-display:swap;
+      src:url("fonts/bebas-neue-latin.woff2") format("woff2");
+      unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD;
+    }
+    /* The game's button face (IBM Plex Sans Condensed SemiBold, SIL OFL), also self-hosted. */
+    @font-face{
+      font-family:"IBM Plex Sans Condensed";
+      font-style:normal;
+      font-weight:600;
+      font-display:swap;
+      src:url("fonts/ibm-plex-sans-condensed-600-latin.woff2") format("woff2");
+      unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     html{height:100%;background:var(--bg);}
@@ -124,14 +145,14 @@
       font-family:var(--font-display);
       font-size:16px;
       line-height:1.7;
-      color:#FDFCF7;
+      color:var(--text);
       text-align:center;
     }
     .blurb{margin:0 0 1.15em;}
     .blurb:last-child{margin:0;}
     /* Embossed text on the navy plate: top-left highlight, bottom-right seat shadow, soft cast shade. */
     .emboss-white{
-      color:#FDFCF7;
+      color:var(--text);
       text-shadow:
         -0.0115em -0.0115em 0.004em rgba(255,255,255,0.78),
          0.0115em  0.015em 0.0115em rgba(0,0,0,0.9),
@@ -196,6 +217,241 @@
     }
     @media (prefers-reduced-motion:reduce){
       .title{animation:none;}
+    }
+    /* --- itch.io CTA ---------------------------------------------------------
+       The game's DS "Primary" button (scripts/ds.gd) rebuilt in CSS: a 3px metal rim
+       lit from the top-left, a 1px cream line inside it, and a steel-blue face on the
+       same diagonal, lettered in IBM Plex Sans Condensed SemiBold in the line's cream
+       with the theme's 1px dark outline. Padding is a touch taller than the in-game
+       10/21 so the tap target clears 44px. */
+    .cta-row[hidden]{display:none;}
+    .cta-row{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:0.9rem;
+      padding:2.75rem 10px 0;
+    }
+    /* lead-in line, set like the blurb above it */
+    .cta-lede{
+      max-width:34rem;
+      padding:0 6vw;
+      font-family:var(--font-display);
+      font-size:16px;
+      line-height:1.7;
+      text-align:center;
+      color:var(--text);
+    }
+    .cta{
+      display:inline-block;
+      padding:3px;                                   /* the metal rim */
+      border-radius:8px;
+      /* rim ramp sampled off DS's BUTTON_RIM_LIGHT -> _MID -> _DARK; "to bottom right"
+         (not 135deg) so the iso-lines run corner to corner exactly as they do in-game */
+      background:linear-gradient(to bottom right,#C6CCCE 0%,#B9C1C3 6%,#939B9D 25%,#7C8487 40%,#687175 50%,#4C555A 75%,#242B2E 100%);
+      text-decoration:none;
+      box-shadow:0 3px 9px rgba(0,0,0,0.45);
+      transition:transform .1s ease;
+    }
+    .cta-face{
+      display:block;
+      padding:12px 24px;
+      border:1px solid #FEEDC3;                      /* the cream line */
+      border-radius:5px;
+      /* the steel-blue face: DS lerps #A7C8D3 -> #3C5C68 down the diagonal, with a
+         white shine over the first third and a darkened bottom-right corner */
+      background:linear-gradient(to bottom right,#B6D2DB 0%,#9AB7C3 20%,#83A3AF 34%,#72929E 50%,#5A7A86 72%,#314B55 100%);
+      /* the 1px bevel the theme paints between the line and the face */
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.30);
+      font-family:var(--font-ui);
+      font-weight:600;
+      font-size:17px;
+      line-height:1.15;
+      letter-spacing:0.01em;
+      white-space:nowrap;
+      color:#FEEDC3;
+      text-shadow:
+         1px 0 0 rgba(0,0,0,0.92), -1px 0 0 rgba(0,0,0,0.92),
+         0 1px 0 rgba(0,0,0,0.92),  0 -1px 0 rgba(0,0,0,0.92);
+      transition:background .18s ease;
+    }
+    .cta:hover .cta-face,.cta:focus-visible .cta-face{
+      background:linear-gradient(to bottom right,#C8DDE4 0%,#A7C8D3 34%,#91BAC8 72%,#6A909D 100%);
+    }
+    .cta:active{transform:translateY(1px);}
+    .cta:active .cta-face{
+      background:linear-gradient(to bottom right,#415962 0%,#2C434C 50%,#1F3037 100%);
+      box-shadow:inset 0 2px 3px rgba(0,0,0,0.45);
+    }
+    .cta:focus-visible{outline:2px solid #FEEDC3;outline-offset:3px;}
+    /* --- Screenshot carousel -------------------------------------------------
+       A filmstrip of framed thumbnails: 1 up on phones, 2 on tablets, 4 on desktop,
+       6 on widescreen. --per-view is set by the media queries below and read back by
+       the script, so the breakpoints stay the single source of truth. The track
+       slides by whole thumbnails; clicking one opens the lightbox. */
+    .shots{
+      position:relative;
+      z-index:1;
+      width:100%;
+      margin:2.75rem auto 0;
+      padding:0 10px;                /* the rules run to here, 10px off the screen edge */
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:1rem;
+    }
+    .shots-title{
+      display:flex;
+      align-items:center;      /* the rules sit on the middle of the text */
+      justify-content:center;
+      gap:10px;                /* clear of the lettering on both sides */
+      width:100%;
+      font-family:var(--font-header);
+      font-weight:400;
+      font-size:clamp(1.75rem,4vw,2.7rem);
+      letter-spacing:0.055em;
+      line-height:1;
+      color:var(--text);
+    }
+    /* Thin rules running out from either side of the heading to the 10px inset. Hidden
+       until the script says both would be at least 100px long — below that they read as
+       stubs, so on a narrow screen the heading stands alone. */
+    .shots-title::before,.shots-title::after{
+      content:"";
+      display:none;
+      flex:1 1 0;
+      height:1px;
+      background:var(--text);
+      /* flex centring lands on the line box, which sits ~0.05em below the middle of
+         the capitals themselves; lift the rules onto the lettering's own middle */
+      transform:translateY(-0.049em);
+    }
+    .shots-title.ruled::before,.shots-title.ruled::after{display:block;}
+    .carousel{
+      --per-view:1;
+      --gap:10px;
+      display:flex;
+      align-items:center;
+      gap:clamp(0.4rem,1.5vw,0.9rem);
+      width:100%;
+      max-width:1800px;
+    }
+    @media (min-width:640px){  .carousel{--per-view:2;} }
+    @media (min-width:1024px){ .carousel{--per-view:4; --gap:12px;} }
+    @media (min-width:1600px){ .carousel{--per-view:6; --gap:14px;} }
+    .stage{
+      flex:1 1 auto;
+      min-width:0;
+      overflow:hidden;
+      touch-action:pan-y;
+    }
+    .track{
+      display:flex;
+      gap:var(--gap);
+      /* one thumbnail step = (track width + gap) / per-view */
+      transform:translateX(calc(-1 * var(--i,0) * (100% + var(--gap)) / var(--per-view)));
+      transition:transform .45s cubic-bezier(.3,.7,.2,1);
+      will-change:transform;
+    }
+    .slide{
+      flex:0 0 calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
+      aspect-ratio:1920 / 1246;
+      overflow:hidden;
+      border:1px solid rgba(233,200,119,0.42);
+      border-radius:4px;
+      background:#02080F;
+      /* thin dark seat inside the gold hairline, so the frame reads as metal */
+      box-shadow:inset 0 0 0 1px rgba(2,8,15,0.85);
+      cursor:zoom-in;
+      transition:border-color .18s ease, filter .18s ease;
+    }
+    .slide img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+    .slide:hover,.slide:focus-visible{border-color:#F1D084;filter:brightness(1.08);}
+    /* Round carousel + lightbox buttons: gold on smoked navy. */
+    .cbtn{
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      width:2.7rem;
+      height:2.7rem;
+      border:1px solid rgba(233,200,119,0.45);
+      border-radius:50%;
+      background:rgba(4,15,27,0.75);
+      color:#F1D084;
+      cursor:pointer;
+      transition:background .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .cbtn svg{width:1.1rem;height:1.1rem;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+    .cbtn:hover,.cbtn:focus-visible{background:rgba(22,44,66,0.92);border-color:#F1D084;color:#FFF3CE;}
+    .dots{display:flex;gap:0.5rem;}
+    .dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      border:1px solid rgba(233,200,119,0.5);
+      background:transparent;
+      cursor:pointer;
+      transition:background .18s ease, border-color .18s ease;
+    }
+    /* every thumbnail currently on screen is lit, so the dots read as a window */
+    .dot[data-on="true"]{background:#F1D084;border-color:#F1D084;}
+    .dot:hover{border-color:#F1D084;}
+    /* nothing to scroll (fewer shots than fit) — drop the controls */
+    .shots.static .cbtn,.shots.static .dots{display:none;}
+    /* --- Lightbox: the shot at full size over a smoked backdrop --- */
+    .lb{
+      position:fixed;
+      inset:0;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:clamp(1rem,5vw,3.5rem);
+      /* near-opaque + a touch of blur so the page text doesn't read through the shot */
+      background:rgba(2,7,13,0.97);
+      -webkit-backdrop-filter:blur(3px);
+              backdrop-filter:blur(3px);
+      animation:lbin .18s ease both;
+    }
+    .lb[hidden]{display:none;}
+    @keyframes lbin{from{opacity:0;}to{opacity:1;}}
+    .lb-img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      border-radius:4px;
+      box-shadow:0 0 0 1px rgba(255,246,214,0.35), 0 18px 44px rgba(0,0,0,0.65);
+    }
+    .lb .cbtn{position:fixed;background:rgba(4,15,27,0.85);}
+    .lb-close{top:clamp(0.7rem,2.2vw,1.4rem);right:clamp(0.7rem,2.2vw,1.4rem);}
+    .lb-prev,.lb-next{width:3.2rem;height:3.2rem;top:50%;transform:translateY(-50%);}
+    .lb-prev svg,.lb-next svg{width:1.4rem;height:1.4rem;}
+    .lb-prev{left:clamp(0.5rem,2.2vw,1.6rem);}
+    .lb-next{right:clamp(0.5rem,2.2vw,1.6rem);}
+    .lb-count{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:clamp(0.6rem,2vw,1.2rem);
+      font-family:var(--font-display);
+      font-size:0.9rem;
+      letter-spacing:.06em;
+      color:rgba(241,208,132,0.8);
+    }
+    html.lb-open{overflow:hidden;}
+    @media (max-width:520px){
+      .carousel{gap:0.3rem;}
+      .cbtn{width:2.2rem;height:2.2rem;}
+      .cbtn svg{width:0.95rem;height:0.95rem;}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .track{transition:none;}
+      .lb{animation:none;}
     }
   </style>
 </head>
@@ -275,9 +531,82 @@
 
   <section class="panel">
     <div class="panel-body">
-      <p class="blurb">Carbon and Capital is a turn-based strategy game where you take over a company and expand into coal, steel, cars, solar panels, computers and everything in between. A demo will come out soon.</p>
+      <p class="blurb">Carbon and Capital is a turn-based strategy game where you take over a company and expand into coal, steel, cars, solar panels, computers and everything in between. A demo will come out later in August 2026.</p>
       <p class="blurb">Try it out to build your industrial legacy.</p>
     </div>
+
+    <div class="cta-row" id="ctaRow" hidden>
+      <p class="cta-lede">Visit the itch.io page to download the demo</p>
+      <a class="cta" href="https://carbonandcapital.itch.io/carbon-and-capital" target="_blank" rel="noopener"><span class="cta-face">Go to itch.io</span></a>
+    </div>
+    <script>
+      // ── FEATURE FLAG ──────────────────────────────────────────────────────────
+      // The itch.io call to action (lead-in line + button) is hidden until the demo
+      // is actually up on itch. Flip this to true to switch it back on — nothing
+      // else to change. It ships hidden in the markup so it can never flash up
+      // before this runs.
+      var SHOW_ITCH_CTA = false;
+
+      if (SHOW_ITCH_CTA) document.getElementById("ctaRow").hidden = false;
+    </script>
+
+    <section class="shots" aria-labelledby="shotsTitle">
+      <h2 class="shots-title" id="shotsTitle"><span>Screenshots</span></h2>
+      <div class="carousel">
+        <button class="cbtn" id="shotPrev" type="button" aria-label="Previous screenshot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 L7 12 L15 20"/></svg></button>
+        <div class="stage" id="shotStage">
+          <div class="track" id="shotTrack">
+            <button class="slide" type="button" data-full="img/shots/shot-01-full.jpg" aria-label="Open screenshot 1 of 11">
+              <img src="img/shots/shot-01.jpg" width="1100" height="714" decoding="async" alt="The hex world map: coastline, farmland, roads and scattered towns.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-02-full.jpg" aria-label="Open screenshot 2 of 11">
+              <img src="img/shots/shot-02.jpg" width="1100" height="714" decoding="async" alt="A pig-iron furnace's production panel open beside the tile's building list.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-03-full.jpg" aria-label="Open screenshot 3 of 11">
+              <img src="img/shots/shot-03.jpg" width="1100" height="714" loading="lazy" decoding="async" alt="The deposits overlay marking coal, iron, copper, bauxite and limestone across the map.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-04-full.jpg" aria-label="Open screenshot 4 of 11">
+              <img src="img/shots/shot-04.jpg" width="1100" height="714" loading="lazy" decoding="async" alt="The market screen listing goods with buy and sell prices and profit per unit.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-05-full.jpg" aria-label="Open screenshot 5 of 11">
+              <img src="img/shots/shot-05.jpg" width="1100" height="714" loading="lazy" decoding="async" alt="The people screen showing a manager's skills, traits and assignment.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-06-full.jpg" aria-label="Open screenshot 6 of 11">
+              <img src="img/shots/shot-06.jpg" width="1100" height="1060" loading="lazy" decoding="async" alt="The empire view: a node graph of your buildings wired together by production links.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-07-full.jpg" aria-label="Open screenshot 7 of 11">
+              <img src="img/shots/shot-07.jpg" width="1100" height="570" loading="lazy" decoding="async" alt="The goods graph tracing limestone, sand and pure water into silica and concrete.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-08-full.jpg" aria-label="Open screenshot 8 of 11">
+              <img src="img/shots/shot-08.jpg" width="1100" height="846" loading="lazy" decoding="async" alt="Two alternative concrete recipes compared side by side.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-09-full.jpg" aria-label="Open screenshot 9 of 11">
+              <img src="img/shots/shot-09.jpg" width="1100" height="559" loading="lazy" decoding="async" alt="The research tree of unlockable industrial technologies.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-10-full.jpg" aria-label="Open screenshot 10 of 11">
+              <img src="img/shots/shot-10.jpg" width="1100" height="862" loading="lazy" decoding="async" alt="The construct menu listing refineries, plants and power stations to build.">
+            </button>
+            <button class="slide" type="button" data-full="img/shots/shot-11-full.jpg" aria-label="Open screenshot 11 of 11">
+              <img src="img/shots/shot-11.jpg" width="1100" height="714" loading="lazy" decoding="async" alt="The infrastructure overlay showing the power cable network across the map at night.">
+            </button>
+          </div>
+        </div>
+        <button class="cbtn" id="shotNext" type="button" aria-label="Next screenshot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 L17 12 L9 20"/></svg></button>
+      </div>
+      <div class="dots">
+        <button class="dot" type="button" aria-label="Screenshot 1" aria-current="true"></button>
+        <button class="dot" type="button" aria-label="Screenshot 2"></button>
+        <button class="dot" type="button" aria-label="Screenshot 3"></button>
+        <button class="dot" type="button" aria-label="Screenshot 4"></button>
+        <button class="dot" type="button" aria-label="Screenshot 5"></button>
+        <button class="dot" type="button" aria-label="Screenshot 6"></button>
+        <button class="dot" type="button" aria-label="Screenshot 7"></button>
+        <button class="dot" type="button" aria-label="Screenshot 8"></button>
+        <button class="dot" type="button" aria-label="Screenshot 9"></button>
+        <button class="dot" type="button" aria-label="Screenshot 10"></button>
+        <button class="dot" type="button" aria-label="Screenshot 11"></button>
+      </div>
+    </section>
   </section>
 
   <script>
@@ -305,6 +634,197 @@
       window.addEventListener("resize", align);
       window.addEventListener("load", align);
     })();
+  </script>
+
+  <!-- Full-size viewer for the carousel: arrows step through the same list, the X (or
+       Esc, or a click on the backdrop) closes it. -->
+  <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer" hidden>
+    <img class="lb-img" id="lbImg" alt="">
+    <button class="cbtn lb-close" id="lbClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18"/></svg></button>
+    <button class="cbtn lb-prev" id="lbPrev" type="button" aria-label="Previous screenshot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 L7 12 L15 20"/></svg></button>
+    <button class="cbtn lb-next" id="lbNext" type="button" aria-label="Next screenshot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 L17 12 L9 20"/></svg></button>
+    <div class="lb-count" id="lbCount"></div>
+  </div>
+
+  <script>
+  // Screenshot carousel + lightbox.
+  //
+  // The strip shows --per-view thumbnails at a time (1 on phones up to 6 on widescreen;
+  // set in the stylesheet and read back here) and slides by whole thumbnails, stopping
+  // when the last one reaches the right edge. Two positions are tracked: `first`, the
+  // leftmost thumbnail on screen, and `cur`, the shot the lightbox is showing. The
+  // lightbox arrows walk every shot in turn and scroll the strip to follow, so closing
+  // it leaves the strip on the shot you were last looking at.
+  (function () {
+    "use strict";
+
+    var track = document.getElementById("shotTrack");
+    var carousel = document.querySelector(".carousel");
+    if (!track || !carousel) return;
+    var shots   = document.querySelector(".shots");
+    var stage   = document.getElementById("shotStage");
+    var slides  = Array.prototype.slice.call(track.children);
+    var dots    = Array.prototype.slice.call(document.querySelectorAll(".dot"));
+    var lb      = document.getElementById("lightbox");
+    var lbImg   = document.getElementById("lbImg");
+    var lbCount = document.getElementById("lbCount");
+    var n = slides.length;
+    var first = 0;
+    var cur = 0;
+
+    // the page behind the lightbox goes inert while it is open, so tab order and
+    // screen readers stay inside the dialog
+    var behind = Array.prototype.slice.call(document.querySelectorAll(".hero, .panel"));
+    function setBehindInert(on) {
+      behind.forEach(function (el) {
+        if (on) el.setAttribute("inert", ""); else el.removeAttribute("inert");
+      });
+    }
+
+    function perView() {
+      var v = parseInt(getComputedStyle(carousel).getPropertyValue("--per-view"), 10);
+      return Math.min(v > 0 ? v : 1, n);
+    }
+    function maxFirst() { return Math.max(0, n - perView()); }
+
+    function render() {
+      var last = first + perView() - 1;
+      track.style.setProperty("--i", first);
+      slides.forEach(function (s, k) {
+        var on = k >= first && k <= last;      // only what's on screen is tabbable
+        s.tabIndex = on ? 0 : -1;
+        s.setAttribute("aria-hidden", on ? "false" : "true");
+      });
+      dots.forEach(function (d, k) {
+        d.setAttribute("data-on", k >= first && k <= last ? "true" : "false");
+        d.setAttribute("aria-current", k === first ? "true" : "false");
+      });
+      shots.classList.toggle("static", n <= perView());
+    }
+
+    // step the strip, wrapping round at both ends
+    function scroll(i) {
+      var max = maxFirst();
+      first = i > max ? 0 : (i < 0 ? max : i);
+      render();
+    }
+
+    // scroll the strip only as far as it takes to bring shot k on screen
+    function reveal(k) {
+      var per = perView();
+      if (k < first) scroll(k);
+      else if (k > first + per - 1) scroll(Math.min(k - per + 1, maxFirst()));
+    }
+
+    function showInLightbox() {
+      var img = slides[cur].querySelector("img");
+      lbImg.src = slides[cur].getAttribute("data-full");
+      lbImg.alt = img.alt;
+      lbCount.textContent = (cur + 1) + " / " + n;
+      reveal(cur);
+    }
+
+    function step(d) {
+      cur = (cur + d + n) % n;
+      showInLightbox();
+    }
+
+    function openLightbox(k) {
+      cur = k;
+      lb.hidden = false;
+      document.documentElement.classList.add("lb-open");
+      setBehindInert(true);
+      showInLightbox();
+      document.getElementById("lbClose").focus();
+    }
+
+    function closeLightbox() {
+      lb.hidden = true;
+      document.documentElement.classList.remove("lb-open");
+      lbImg.removeAttribute("src");
+      setBehindInert(false);
+      slides[cur].focus();
+    }
+
+    document.getElementById("shotPrev").addEventListener("click", function () { scroll(first - 1); });
+    document.getElementById("shotNext").addEventListener("click", function () { scroll(first + 1); });
+    dots.forEach(function (d, k) {
+      d.addEventListener("click", function () { scroll(Math.min(k, maxFirst())); });
+    });
+
+    // Swipe the strip (and the lightbox) left/right; a swipe must not also count as a
+    // click, or dragging the strip would pop the lightbox open.
+    var downX = null, swiped = false;
+    function swipeStart(e) { downX = e.clientX; swiped = false; }
+    function swipeEnd(e) {
+      if (downX === null) return;
+      var dx = e.clientX - downX;
+      downX = null;
+      if (Math.abs(dx) <= 40) return;
+      swiped = true;
+      if (lb.hidden) scroll(first + (dx < 0 ? 1 : -1));
+      else step(dx < 0 ? 1 : -1);
+    }
+    stage.addEventListener("pointerdown", swipeStart);
+    stage.addEventListener("pointerup", swipeEnd);
+    stage.addEventListener("pointercancel", function () { downX = null; });
+    lb.addEventListener("pointerdown", swipeStart);
+    lb.addEventListener("pointerup", swipeEnd);
+
+    slides.forEach(function (s, k) {
+      s.addEventListener("click", function () {
+        if (swiped) { swiped = false; return; }
+        openLightbox(k);
+      });
+    });
+
+    document.getElementById("lbClose").addEventListener("click", closeLightbox);
+    document.getElementById("lbPrev").addEventListener("click", function () { step(-1); });
+    document.getElementById("lbNext").addEventListener("click", function () { step(1); });
+    // a click anywhere off the picture (the backdrop) closes
+    lb.addEventListener("click", function (e) { if (e.target === lb) closeLightbox(); });
+
+    document.addEventListener("keydown", function (e) {
+      if (lb.hidden) return;
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
+      else return;
+      e.preventDefault();
+    });
+
+    // The heading's rules are only worth drawing when there is real length in them:
+    // measure what is left either side of the lettering and show them past 100px.
+    var title = document.getElementById("shotsTitle");
+    var RULE_GAP = 10, RULE_MIN = 100;
+    function fitRules() {
+      var text = title.firstElementChild;
+      if (!text) return;
+      var each = (title.clientWidth - text.offsetWidth - 2 * RULE_GAP) / 2;
+      title.classList.toggle("ruled", each >= RULE_MIN);
+    }
+    // the web font lands after first paint and changes how wide the lettering is
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitRules);
+
+    // The strip clips whatever is off-window, so a lazy thumbnail only starts loading
+    // the moment it slides in — which shows as a blank frame. Once the page itself has
+    // loaded, warm the rest so paging is instant.
+    function warmThumbs() {
+      slides.forEach(function (s) { s.querySelector("img").loading = "eager"; });
+    }
+    if (document.readyState === "complete") warmThumbs();
+    else window.addEventListener("load", warmThumbs);
+
+    // --per-view changes at the breakpoints: re-clamp the window to the new width
+    window.addEventListener("resize", function () {
+      first = Math.min(first, maxFirst());
+      render();
+      fitRules();
+    });
+
+    render();
+    fitRules();
+  })();
   </script>
 
   <!-- Visitor analytics -->
