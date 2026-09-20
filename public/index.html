@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carbon and Capital</title>
-  <meta name="description" content="Carbon and Capital is a strategy game. A demo is coming soon.">
+  <meta name="description" content="Carbon and Capital is a strategy game with a demo available on itch.io for Windows, Linux and MacOS.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%230F1A17'/%3E%3Cpath d='M16 2a14 14 0 000 28z' fill='%2374B89A'/%3E%3Cpath d='M16 2a14 14 0 010 28z' fill='%23CBA255'/%3E%3C/svg%3E">
   <style>
     :root{
@@ -87,6 +87,38 @@
       to{   -webkit-mask-position:0% 100%;   mask-position:0% 100%; }
     }
     @media (prefers-reduced-motion:reduce){ .hex-wave{ animation:none; opacity:0; } }
+    .top-nav{
+      position:absolute;
+      top:1rem;
+      right:clamp(1rem,3vw,2.4rem);
+      z-index:5;
+      display:flex;
+      gap:.65rem;
+    }
+    .top-nav a{
+      display:inline-block;
+      padding:.48rem .78rem;
+      border:1px solid rgba(241,208,132,.55);
+      border-radius:6px;
+      background:rgba(4,15,27,.78);
+      color:#FEEDC3;
+      font-family:var(--font-ui);
+      font-weight:600;
+      font-size:.95rem;
+      letter-spacing:.025em;
+      text-decoration:none;
+      box-shadow:0 4px 12px rgba(0,0,0,.28);
+    }
+    .top-nav a:hover,.top-nav a:focus-visible{
+      border-color:#F1D084;
+      background:rgba(22,44,66,.94);
+      color:#FFF6DA;
+    }
+    .top-nav a:focus-visible{outline:2px solid #FEEDC3;outline-offset:3px;}
+    @media (max-width:520px){
+      .top-nav{top:.65rem;right:.65rem;}
+      .top-nav a{padding:.4rem .65rem;font-size:.86rem;}
+    }
     /* The metallic 7-hex plate (union of 4 top + 3 bottom hexes, gaps bridged) that the
        text sits on. Positioned to the viewport centre, matching the flex-centred <main>. */
     #plate{
@@ -457,6 +489,9 @@
 </head>
 <body>
   <div class="hex-wave" aria-hidden="true"></div>
+  <nav class="top-nav" aria-label="Primary navigation">
+    <a href="devlogs/">Devlogs</a>
+  </nav>
 
   <header class="hero">
     <div class="emblem">
@@ -531,24 +566,13 @@
 
   <section class="panel">
     <div class="panel-body">
-      <p class="blurb">Carbon and Capital is a turn-based strategy game where you take over a company and expand into coal, steel, cars, solar panels, computers and everything in between. A demo will come out later in August 2026.</p>
-      <p class="blurb">Try it out to build your industrial legacy.</p>
+      <p class="blurb">Carbon and Capital is a turn-based strategy game where you take over a company and expand into coal, steel, cars, solar panels, computers and everything in between.</p>
     </div>
 
-    <div class="cta-row" id="ctaRow" hidden>
-      <p class="cta-lede">Visit the itch.io page to download the demo</p>
-      <a class="cta" href="https://carbonandcapital.itch.io/carbon-and-capital" target="_blank" rel="noopener"><span class="cta-face">Go to itch.io</span></a>
+    <div class="cta-row" id="ctaRow">
+      <p class="cta-lede">Demo out on itch.io for Windows, Linux and MacOS</p>
+      <a class="cta" href="https://carbonandcapital.itch.io/carbon-and-capital" target="_blank" rel="noopener"><span class="cta-face">Download on itch.io</span></a>
     </div>
-    <script>
-      // ── FEATURE FLAG ──────────────────────────────────────────────────────────
-      // The itch.io call to action (lead-in line + button) is hidden until the demo
-      // is actually up on itch. Flip this to true to switch it back on — nothing
-      // else to change. It ships hidden in the markup so it can never flash up
-      // before this runs.
-      var SHOW_ITCH_CTA = false;
-
-      if (SHOW_ITCH_CTA) document.getElementById("ctaRow").hidden = false;
-    </script>
 
     <section class="shots" aria-labelledby="shotsTitle">
       <h2 class="shots-title" id="shotsTitle"><span>Screenshots</span></h2>
