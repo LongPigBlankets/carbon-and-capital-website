@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How I built an industrial tycoon — Carbon and Capital</title>
+  <meta name="description" content="The first Carbon and Capital devlog: reaching the public demo, hand-building the road network and solving circular production costs.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How I built an industrial tycoon and why roads kicked my ass">
+  <meta property="og:description" content="The first Carbon and Capital devlog: roads, recursive costs and the long road to a public demo.">
+  <meta property="og:image" content="https://carbonandcapital.com/img/devlogs/first-devlog-cover.png">
+  <meta property="article:published_time" content="2026-09-20">
+  <link rel="stylesheet" href="../devlogs.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../../"><span>Carbon</span><span class="brand-and">and</span><span>Capital</span></a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="../">All devlogs</a>
+      <a class="play-link" href="https://carbonandcapital.itch.io/carbon-and-capital">Play the demo</a>
+    </nav>
+  </header>
+
+  <main class="article-shell">
+    <article>
+      <figure class="article-cover">
+        <img src="../../img/devlogs/first-devlog-cover.png" width="1672" height="941" alt="A stylised Carbon and Capital map behind the game emblem and first devlog title.">
+      </figure>
+
+      <header class="article-header">
+        <p class="eyebrow"><time datetime="2026-09-20">20 September 2026</time> · Devlog 01</p>
+        <h1>How I built an industrial tycoon and why roads kicked my ass</h1>
+        <p class="article-deck">After nearly a year of solo development, Carbon and Capital now has its first public demo.</p>
+      </header>
+
+      <div class="prose">
+        <p>I can't believe I finally got here. It's been intense, but also really rewarding. Making this game was like playing whackamole. I was making changes to the tutorial and then realising I'd messed up a cost calculation and had to debug that before I could finish my original task. Sidequest on top of sidequest to get this game here. But I made it.</p>
+
+        <h2>What is the game about?</h2>
+
+        <p>It's about making things OR buying them. I wanted a game loop where you're not just trying to match production recipe ratios. Instead, for every recipe you can just lean on the global market either to buy some or all your inputs, and also to sell onto.</p>
+
+        <p>The game models production chains, transport, changing market prices and rivals. All of those systems have to agree about what something costs and tell you, the player, enough for their decisions to feel understandable.</p>
+
+        <p>Two of the hardest parts so far have been the road network and the cost solver. This devlog is about why they became difficult, what changed while building the demo, and what still needs work.</p>
+
+        <h2><span class="number">1.</span> Roads</h2>
+
+        <p>The roads you see on a tile aren't just visual. If a tile has roads, transports move faster over them.</p>
+
+        <p>The complexity here didn't come from the cost of roads or even from the throughput and the mechanics of road capacity, though that was challenging in its own right. No, the problem was making roads look nice. This game has a birdseye, topdown map. Nevermind that there's not a lot of games like that to even get inspiration from (i had to lean on historical maps like Sanborn Fire Insurance and Booth's Poverty Maps), but I also knew I didn't want to make it procedural. I tried procedural just in case (i'm often wrong so I thought why not try it) and it convinced me this was a job to be done by hand. So I drew the roads by trying to give JSON format coordinates to the game and then realised not only was this really difficult but also it was ugly and I made many mistakes. Roads in reality owe their shape to the locations they connect, the relief they avoid or take advantage of, as well as the preexisting buildings they have to avoid. This made it a catch-22. Without roads where do I place the buildings and without buildings where do I place the roads?</p>
+
+        <p>So the fix was to build a mini map editor for myself to place rivers then draft buildings visually, then roads (and then more final buildings and then trees and so on...). Then, many months after I had first started the project of making roads pretty I finally had my breakthrough and now roads look how I want them. Naturally, I still tweak the odd road because they had slightly wrong curvature or turn a bit sharply or some other reason to procrastinate from actually important feature work.</p>
+
+        <figure class="wide-figure">
+          <img src="../../img/devlogs/stoneshore-roads.png" width="3388" height="1882" loading="lazy" alt="A top-down view of the hand-drawn roads, buildings and docks in Stoneshore.">
+          <figcaption>The hand-built road network through Stoneshore.</figcaption>
+        </figure>
+
+        <h2><span class="number">2.</span> The cost solver</h2>
+
+        <p>A game where you can buy from the market and the market prices move is hard. But a game where the power is made with coal and the coal mines require power to produce coal is really hard.</p>
+
+        <figure class="wide-figure">
+          <img src="../../img/devlogs/cost-solver-loop.png" width="1800" height="1000" loading="lazy" alt="A diagram showing coal and water entering a power plant, power feeding a coal mine and furnace, and coal looping back through the production chain.">
+          <figcaption>The circular dependency at the heart of the cost solver.</figcaption>
+        </figure>
+
+        <p>Back in university I'd done some statistics and graph theory and I pulled the concept of Directed Acyclical Graphs and Leontief Input-Output models out of my cobwebbed memory and started refreshing my understanding. This involved a lot of iterations and deciding how many loops I should let the game run within each turn (for example, each loop beyond the 2nd added increasing amounts of milliseconds to the turn change time no matter how well I optimised the code and at 20+ buildings this was becoming a problem). So I kept iterating with sparse matrices and other tools and eventually I had a system for calculating costs across 50+ goods (the demo now has 73) in iterative loops that ignore any recursive goods until all other goods have a formula related to the recursive goods and then resolves all of them at once. Once that was solved and for the first time in my life I documented how it worked as soon as I finished working on it, debugging any CostSolver issues became manageable. Not easy, but manageable.</p>
+
+        <p>But even though the solver can calculate that a factory is losing money, the player needs to know why. Is electricity expensive? Are inputs travelling too far? Has their own buying pushed up the market price? Are they producing more than the market can absorb?</p>
+
+        <p>Much of the work was not just calculating costs, but deciding which information to expose and when. I decided early that the most important number for a building is its cost of producing a unit of a given output. The 2nd most important is how cheap or expensive that number is relative to what you could've bought it for from the global market. Both numbers (or rather the number and the %) needed to be front and centre.</p>
+
+        <p>These are just some of the things Carbon and Capital has on offer. It's a game about managing a business as the politics, energy grid and markets around you keep changing. You have to adapt and make the world adapt to you in return.</p>
+
+        <p>Releasing the demo is the beginning of the public part of development, not the end of it. I already have a list of bug fixes, interface improvements and features I want to explore, but I also don’t want to keep designing the game in isolation.</p>
+
+        <p>If you play, I would particularly like to hear:</p>
+
+        <ul class="feedback-list">
+          <li>Whether you specialised in something or went up and down the supply chain</li>
+          <li>The first moment when the interface or economy stopped making sense</li>
+          <li>If you liked something about the game</li>
+        </ul>
+
+        <div class="demo-callout">
+          <p>You can download the free demo here: <a href="https://carbonandcapital.itch.io/carbon-and-capital">carbonandcapital.itch.io/carbon-and-capital</a></p>
+          <p>Follow Carbon and Capital on itch.io if you want updates as the demo receives fixes and new features over the coming weeks. I’m also working towards a Steam page, and I’ll announce it here when it is ready (not for at least 2 months)</p>
+        </div>
+
+        <p>Thank you to the 40+ people who have already downloaded the demo and shared feedback. It has been enormously helpful at this stage.</p>
+      </div>
+
+      <footer class="article-footer"><a href="../">← Back to all devlogs</a></footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">Carbon and Capital · A turn-based industrial strategy game</footer>
+
+  <script data-goatcounter="https://carbonandcapital.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
