@@ -1,0 +1,46 @@
+name: Refresh dashboard data
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - "tools/fetch_dashboard.py"
+      - ".github/workflows/dashboard-data.yml"
+
+concurrency:
+  group: dashboard-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch the games from GameOracle
+        env:
+          GAME_ORACLE_KEY: ${{ secrets.GAME_ORACLE_KEY }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: python tools/fetch_dashboard.py --out build/dashboard-data
+
+      - name: Install paramiko
+        run: pip install "paramiko>=3.4"
+
+      - name: Upload to the private data folder
+        env:
+          SFTP_HOST: ${{ secrets.WEB_FTP_SERVER }}
+          SFTP_USER: ${{ secrets.WEB_FTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.WEB_FTP_PASSWORD }}
+          LOCAL_DIR: build/dashboard-data
+          REMOTE_DIR: public_html/dashboard/data
+        run: python deploy.py

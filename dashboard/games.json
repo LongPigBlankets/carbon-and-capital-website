@@ -1,0 +1,24 @@
+{
+  "_comment": "Steam app ids tracked on /dashboard. Released and unreleased groups are decided from the fetched data, so a game moves across on its own when it launches.",
+  "games": [
+    {"app_id": 754500, "title": "Plutocracy"},
+    {"app_id": 1207650, "title": "Suzerain"},
+    {"app_id": 503940, "title": "Railway Empire"},
+    {"app_id": 1410710, "title": "Democracy 4"},
+    {"app_id": 245470, "title": "Democracy 3"},
+    {"app_id": 7600, "title": "Sid Meier's Railroads!"},
+    {"app_id": 896160, "title": "Evil Bank Manager"},
+    {"app_id": 983380, "title": "Car Manufacture"},
+    {"app_id": 936500, "title": "Transport INC"},
+    {"app_id": 1407180, "title": "Lawgivers II"},
+    {"app_id": 1677970, "title": "Railroad Corporation 2"},
+    {"app_id": 3525620, "title": "Wall Street Raider"},
+    {"app_id": 4875060, "title": "Rich List: The Order"},
+    {"app_id": 2189430, "title": "Gilded Destiny"},
+    {"app_id": 2555230, "title": "Logistic Master"},
+    {"app_id": 4736860, "title": "FD's Industry Tycoon"},
+    {"app_id": 5037110, "title": "Economicon"},
+    {"app_id": 2920840, "title": "Shareholders"},
+    {"app_id": 4986590, "title": "CAPITALIUM"}
+  ]
+}
