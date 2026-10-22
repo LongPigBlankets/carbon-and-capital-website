@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How buildings work, and why recipes nearly drove me insane — Carbon and Capital</title>
+  <meta name="description" content="The second Carbon and Capital devlog: shared buildings, recipes that carry everything, and the twelve balancing passes it took to get there.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How buildings work, and why recipes nearly drove me insane">
+  <meta property="og:description" content="The second Carbon and Capital devlog: shared buildings, recipes that carry everything, and the balancing wall.">
+  <meta property="og:image" content="https://carbonandcapital.com/img/devlogs/second-devlog-cover.png">
+  <meta property="article:published_time" content="2026-10-22">
+  <link rel="stylesheet" href="../devlogs.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../../"><span>Carbon</span><span class="brand-and">and</span><span>Capital</span></a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="../">All devlogs</a>
+      <a class="play-link" href="https://carbonandcapital.itch.io/carbon-and-capital">Play the demo</a>
+    </nav>
+  </header>
+
+  <main class="article-shell">
+    <article>
+      <figure class="article-cover">
+        <img src="../../img/devlogs/second-devlog-cover.png" width="1672" height="941" alt="The Carbon and Capital emblem and the second devlog title beside an isometric map plate of a port, a steelworks and a town.">
+      </figure>
+
+      <header class="article-header">
+        <p class="eyebrow"><time datetime="2026-10-22">22 October 2026</time> · Devlog 02</p>
+        <h1>How buildings work, and why recipes nearly drove me insane</h1>
+        <p class="article-deck">Recipes ended up carrying almost everything that used to live on buildings. Here is how that happened, and what it cost.</p>
+      </header>
+
+      <div class="prose">
+        <p>Last time I wrote about roads and the cost solver. This one is about the thing the cost solver spends most of its time chewing on: recipes, and how they ended up carrying almost everything that used to live on buildings. (And also driving me insane when first balancing the game)</p>
+
+        <h2>Two ways to do buildings</h2>
+
+        <p>There are two approaches I’ve seen in tycoon and economic sims.</p>
+
+        <ol class="approach-list">
+          <li><strong>Each building does one job.</strong> This is the Anno approach (I have many hours in Anno 1800). Once you pick a building, that’s it, so a cannon factory makes cannons. Progression is about unlocking the buildings.</li>
+          <li><strong>Buildings are shared and you swap what they do.</strong> A factory can make screws, beams, wire or some complex part interchangeably and there may be a retooling cost, but the puzzle becomes unlocking more production methods rather than more buildings. Progression is about unlocking production methods.</li>
+        </ol>
+
+        <p>Carbon and Capital uses the second. The idea that sparked the whole game was “what if you didn’t have to unlock the entire chain to build complex parts?” I wanted a world where you can build wind turbines on turn 1 and buy whatever you can’t make yet. That only works if a building can be pointed at a recipe, and it is the same idea as the MAKE OR BUY loop I went on about last time.</p>
+
+        <p>In Carbon and Capital, switching a building to a new recipe costs some time. Upgrading also costs construction materials depending on the building. You are basically changing the layout of the building, so it is not free. It also couldn’t be free for a gameplay reason: upgraded recipes are often, if not always, a good thing, so a free swap would be a free lunch. When they aren’t straight upgrades, they unlock different strategies such as rare earth-free recipes. There are some ways to make the switch or upgrade smoother, which I’ll leave for you to find.</p>
+
+        <h2>What’s in a name, ahem… I mean recipe</h2>
+
+        <p>When I started, a recipe was barely anything: what it took in, what it put out and how much power it used. Over time I kept adding properties to recipes rather than to buildings. Recipe names came first, which sounds trivial but did a lot for the lore (and gave me a lot of research to figure out the difference between Aluminium Carbothermic Reduction and Aluminum Carbochlorination). Pollution went on recipes because a furnace making glass does not pollute like a furnace burning coal for iron ingots.</p>
+
+        <p>Today a building only holds its construction and upgrade costs, maintenance, name, size and art. Everything else is the recipe: inputs, outputs, power, pollution, labour split into unskilled, skilled and highly skilled, and whether you have to unlock it first. You build a chemical plant, assign it the Chlor Alkali recipe, and all of that comes out of the recipe.</p>
+
+        <figure class="tall-figure">
+          <img src="../../img/devlogs/chemical-plant-recipes.png" width="1274" height="1848" loading="lazy" alt="The Change recipe sheet of a chemical plant, listing Chlor-Alkali Process, Polysilicon Smelting, Haber Bosch, Fertilisers, Rubber Vulcanisation and more, each with its inputs and outputs drawn as icons.">
+          <figcaption>The chemical plant’s recipe picker. One building, fifteen recipes to point it at.</figcaption>
+        </figure>
+
+        <h2>The balancing wall</h2>
+
+        <p>Getting here took about twelve balancing passes. It is technically still not finished, just settled. For most of those passes, labour cost lived on the building, and that is what made the whole thing impossible to balance.</p>
+
+        <p>Here’s why. A building’s labour bill was one number. Put a cheap recipe and an expensive recipe in the same building and you either made the cheap one a loss or the expensive one a goldmine. There was no setting that made both work, never mind different prices for different goods, labour costs that at least approached credibility, or recipes that stayed profitable until you built too far from a port.</p>
+
+        <p>My target for a decent early game recipe was slightly profitable at £20 profit a turn so transport and other costs could drive real decisions. While balancing I had accidentally created one version where a single aluminium furnace upgraded to L3 could make +£600 per turn profit, while several buildings producing rubber, then tyres, car bodies, engines and then cars could only squeeze out +£400 despite being the more integrated chain. I wanted the game to reward this kind of integration, so I had to do better. As soon as I realised this was happening (this was before I had end to end tests to catch these kinds of mistakes) I put my head in my hands and went on to rebalance the recipes for the tenth time.</p>
+
+        <p>If you ever want to sink a few dozen hours on spreadsheets and achieve nothing, I highly recommend rebalancing blindly. 10/10 would do again.</p>
+
+        <p>Several months ago (around that 10th balancing round), I moved labour cost onto recipes. Buildings got simpler, recipes got richer, and I had finally achieved balance.</p>
+
+        <figure class="inline-figure">
+          <img src="../../img/devlogs/balancing-avatar.jpg" width="998" height="594" loading="lazy" alt="A panda sitting cross-legged under a blossom tree, eyes closed, arms out, perfectly at peace.">
+        </figure>
+
+        <h2>What recipes buy you</h2>
+
+        <p>When I set out I wanted an industrially realistic chain, but not so complex that only the most die hard chemical and industrial fans would play it. Tricky balance. Even trickier once I decided to only add a good or a recipe if it created a genuine decision for the player.</p>
+
+        <p>So the demo has 73 goods, from industrial tycoon stalwarts like steel and coal all the way to hydraulic components, large vehicles, industrial acids and CPUs. Each recipe tries to set a puzzle or reward you for solving one. This is why the game loop is centred on advancing within an industry rather than climbing a tech tree from coal to CPUs and electric cars.</p>
+
+        <p>Roughly a third of recipes have to be earned by doing. Run a furnace long enough and your workers and researchers figure out how to make steel more efficiently and boom, you unlock Basic Oxygen Steelmaking, which is more profitable than regular Steelmaking.</p>
+
+        <figure class="wide-figure">
+          <img src="../../img/devlogs/basic-oxygen-steelmaking-unlock.png" width="2400" height="1247" loading="lazy" alt="The Research panel on the Metallurgy board. The Oxygen-Enriched Blast drawing carries a red GRANTED stamp and the readout above says it unlocks the Basic Oxygen Steelmaking recipe.">
+          <figcaption>The Basic Oxygen Steelmaking unlock, earned by producing oxygen rather than by spending research points.</figcaption>
+        </figure>
+
+        <p>Some unlocks are more generous than that, but push you into more complex chains if you want to master them. Basic Oxygen Steelmaking drops coal as an input and wants oxygen instead, which has its own quirks, like being a liquid in game.</p>
+
+        <p>(Please don’t make me change it back to a gas.)</p>
+
+        <p>Other recipes are more profitable but run in a different building than the one you started with. Industrial Goods Factories give way to Assembly Plants and then High Tech Manufactories. Some goods have a recipe in all three. Hint: the High Tech stuff is usually better.</p>
+
+        <p>All in all, recipes have turned out to be pretty versatile. If they need rebalancing in future, that should be manageable (he says, dooming himself) and they add a bit of depth that buildings alone never did.</p>
+
+        <h2>Next time</h2>
+
+        <p>The next devlog is about transport and how it works in game. Probably next month.</p>
+
+        <div class="demo-callout">
+          <p>The free demo is here: <a href="https://carbonandcapital.itch.io/carbon-and-capital">carbonandcapital.itch.io/carbon-and-capital</a></p>
+          <p>If you play, I’d like to know which recipe you unlocked first and whether it changed what you built next. Follow the page on itch.io for updates as the demo receives fixes, and thank you to everyone who has downloaded it and sent feedback so far.</p>
+        </div>
+      </div>
+
+      <footer class="article-footer"><a href="../">← Back to all devlogs</a></footer>
+    </article>
+  </main>
+
+  <footer class="site-footer">Carbon and Capital · A turn-based industrial strategy game</footer>
+
+  <script data-goatcounter="https://carbonandcapital.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
