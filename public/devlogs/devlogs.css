@@ -173,7 +173,20 @@ h1,h2{font-family:var(--font-display);font-weight:400;letter-spacing:.025em;line
   border-radius:10px;
   box-shadow:0 16px 40px rgba(0,0,0,.3);
 }
+.tall-figure{max-width:34rem;margin:2.4rem auto 2.6rem;}
+.tall-figure img,
+.inline-figure img{
+  width:100%;
+  height:auto;
+  border:1px solid var(--rule);
+  border-radius:10px;
+  box-shadow:0 16px 40px rgba(0,0,0,.3);
+}
+.inline-figure{margin:2.2rem 0 2.6rem;}
 figcaption{margin-top:.65rem;color:var(--muted);font-size:.88rem;text-align:center;}
+.approach-list{margin:.2rem 0 1.6rem;padding-left:1.35rem;}
+.approach-list li{margin:.6rem 0;padding-left:.25rem;}
+.approach-list strong{color:var(--cream);}
 .feedback-list{margin:.2rem 0 1.6rem;padding-left:1.35rem;}
 .feedback-list li{margin:.45rem 0;padding-left:.25rem;}
 .demo-callout{
